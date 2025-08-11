@@ -1,0 +1,19 @@
+{
+  "name": "resource-file-archive",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TakuKobayashi/resource-file-archives.git"
+  },
+  "author": "TakuKobayashi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TakuKobayashi/resource-file-archives/issues"
+  },
+  "homepage": "https://github.com/TakuKobayashi/resource-file-archives#readme",
+  "description": ""
+}
