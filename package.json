@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --config .prettierrc --write \"src/**/*.{ts,js}\"",
+    "tsx": "tsx"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,17 @@
     "url": "https://github.com/TakuKobayashi/resource-file-archives/issues"
   },
   "homepage": "https://github.com/TakuKobayashi/resource-file-archives#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^24.2.1",
+    "commander": "^14.0.0",
+    "documentation": "^14.0.3",
+    "dotenv": "^17.2.1",
+    "fast-glob": "^3.3.3",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.3",
+    "typedoc": "^0.28.10",
+    "typescript": "^5.9.2",
+    "typings": "^2.1.1"
+  }
 }
