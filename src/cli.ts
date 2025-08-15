@@ -5,6 +5,7 @@ import path from 'path';
 import fg from 'fast-glob';
 import crypto from 'crypto';
 import fsPromise from 'fs/promises';
+import { getTableName } from 'drizzle-orm';
 import { reset } from 'drizzle-seed';
 
 import { db } from './db/connections';
@@ -60,6 +61,7 @@ importCommand.command('glogfile').action(async (options: any) => {
   }
   const resourceFileValues = await Promise.all(resourceFileValuePromises);
   await reset(db, schema);
+  await db.execute(`ALTER SEQUENCE ${getTableName(resourceFiles)}_id_seq RESTART WITH 1;`);
   await db.insert(resourceFiles).values(resourceFileValues).onConflictDoNothing();
   await db.$client.end();
 });
