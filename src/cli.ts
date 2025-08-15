@@ -5,9 +5,11 @@ import path from 'path';
 import fg from 'fast-glob';
 import crypto from 'crypto';
 import fsPromise from 'fs/promises';
+import { reset } from 'drizzle-seed';
 
 import { db } from './db/connections';
 import { resourceFiles } from './db/schema';
+import * as schema from './db/schema';
 import { exportToCSV, loadExistTableNames } from './utils/data-exporters';
 
 /**
@@ -23,7 +25,7 @@ importCommand.description('import files info');
 async function newResourceFile(filePath: string): Promise<typeof resourceFiles.$inferInsert> {
   const appDir = path.dirname(require.main?.filename || '');
   const resolveFilePath = path.resolve(filePath);
-  const filepathFromRoot = resolveFilePath.replace(path.resolve(appDir), '');
+  const filepathFromRoot = resolveFilePath.replace(path.resolve(appDir, '..'), '').split(path.sep).join('/');
   const parsedPath = path.parse(resolveFilePath);
   const stat = await fsPromise.stat(resolveFilePath);
   const fileHash = await generateFileHash(resolveFilePath);
@@ -57,6 +59,7 @@ importCommand.command('glogfile').action(async (options: any) => {
     resourceFileValuePromises.push(newResourceFile(filePath));
   }
   const resourceFileValues = await Promise.all(resourceFileValuePromises);
+  await reset(db, schema);
   await db.insert(resourceFiles).values(resourceFileValues).onConflictDoNothing();
   await db.$client.end();
 });
