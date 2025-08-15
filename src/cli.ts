@@ -7,11 +7,13 @@ import crypto from 'crypto';
 import fsPromise from 'fs/promises';
 import { getTableName } from 'drizzle-orm';
 import { reset } from 'drizzle-seed';
+import _ from 'lodash';
 
 import { db } from './db/connections';
 import { resourceFiles } from './db/schema';
 import * as schema from './db/schema';
 import { exportToCSV, loadExistTableNames } from './utils/data-exporters';
+import { threedFileExtensions, imageFileExtensions, pdfFileExtensions } from './utils/resource-file-types';
 
 /**
  * Set global CLI configurations
@@ -54,7 +56,16 @@ async function generateFileHash(filePath: string): Promise<string> {
 
 importCommand.command('glogfile').action(async (options: any) => {
   const appDir = path.dirname(require.main?.filename || '');
-  const threedModelFilePaths = fg.sync([...appDir.split(path.sep), `..`, 'resources', '**', '*.{glb,fbx,obj}'].join('/'), { dot: true });
+  const threedModelFilePaths = fg.sync(
+    [
+      ...appDir.split(path.sep),
+      `..`,
+      'resources',
+      '**',
+      `*.{${_.union(threedFileExtensions, imageFileExtensions, pdfFileExtensions).join(',')}}`,
+    ].join('/'),
+    { dot: true },
+  );
   const resourceFileValuePromises: Promise<typeof resourceFiles.$inferInsert>[] = [];
   for (const filePath of threedModelFilePaths) {
     resourceFileValuePromises.push(newResourceFile(filePath));
