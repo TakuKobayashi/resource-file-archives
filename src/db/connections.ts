@@ -6,5 +6,6 @@ export const dbConnectionUrl = `postgresql://${process.env.PGSQL_USERNAME}:${pro
 
 const pool = new Pool({
   connectionString: dbConnectionUrl,
+  max: 20, // 接続を張り続けるコネクション数を指定
 });
 export const db = drizzle({ client: pool });

@@ -21,12 +21,15 @@ const importCommand = new Command('import');
 importCommand.description('import files info');
 
 async function newResourceFile(filePath: string): Promise<typeof resourceFiles.$inferInsert> {
-  const parsedPath = path.parse(filePath);
-  const stat = await fsPromise.stat(filePath);
-  const fileHash = await generateFileHash(filePath);
+  const appDir = path.dirname(require.main?.filename || '');
+  const resolveFilePath = path.resolve(filePath);
+  const filepathFromRoot = resolveFilePath.replace(path.resolve(appDir), '');
+  const parsedPath = path.parse(resolveFilePath);
+  const stat = await fsPromise.stat(resolveFilePath);
+  const fileHash = await generateFileHash(resolveFilePath);
   return {
     name: parsedPath.name,
-    path: filePath,
+    path: filepathFromRoot,
     extension: parsedPath.ext,
     hash: fileHash,
     size: stat.size,
@@ -55,6 +58,7 @@ importCommand.command('glogfile').action(async (options: any) => {
   }
   const resourceFileValues = await Promise.all(resourceFileValuePromises);
   await db.insert(resourceFiles).values(resourceFileValues).onConflictDoNothing();
+  await db.$client.end();
 });
 
 importCommand
@@ -76,6 +80,7 @@ exportCommand.description('export files info data');
 exportCommand.command('csv').action(async (options: any) => {
   const tableNames = await loadExistTableNames();
   await exportToCSV(tableNames);
+  await db.$client.end();
 });
 
 program.addCommand(exportCommand);
