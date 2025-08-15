@@ -3,12 +3,12 @@ import { program, Command } from 'commander';
 import packageJson from '../package.json';
 import path from 'path';
 import fg from 'fast-glob';
-import fs from 'fs';
 import crypto from 'crypto';
 import fsPromise from 'fs/promises';
 
 import { db } from './db/connections';
 import { resourceFiles } from './db/schema';
+import { exportToCSV, loadExistTableNames } from './utils/data-exporters';
 
 /**
  * Set global CLI configurations
@@ -74,8 +74,8 @@ program.addCommand(importCommand);
 const exportCommand = new Command('export');
 exportCommand.description('export files info data');
 exportCommand.command('csv').action(async (options: any) => {
-  const resourceFilesData = await db.select().from(resourceFiles);
-  console.log(resourceFilesData);
+  const tableNames = await loadExistTableNames();
+  await exportToCSV(tableNames);
 });
 
 program.addCommand(exportCommand);

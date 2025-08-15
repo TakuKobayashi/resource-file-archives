@@ -33,6 +33,7 @@
     "typings": "^2.1.1"
   },
   "dependencies": {
+    "@json2csv/plainjs": "^7.0.6",
     "drizzle-orm": "^0.44.4",
     "pg": "^8.16.3"
   }
