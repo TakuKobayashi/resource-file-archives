@@ -66,18 +66,6 @@ importCommand.command('glogfile').action(async (options: any) => {
   await db.$client.end();
 });
 
-importCommand
-  .command('filepath')
-  .option('-p, --path <filepaths...>', 'add filepaths')
-  .action(async (options: any) => {
-    console.log(options);
-    //const result = await db.select().from(resourceFiles);
-    const result = await db.execute(
-      `SELECT table_name FROM information_schema.tables WHERE table_schema='public'AND table_type='BASE TABLE';`,
-    );
-    console.log(result.rows);
-  });
-
 program.addCommand(importCommand);
 
 const exportCommand = new Command('export');
