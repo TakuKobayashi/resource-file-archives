@@ -13,6 +13,7 @@ import { db } from './db/connections';
 import { resourceFiles } from './db/schema';
 import * as schema from './db/schema';
 import { exportToCSV, loadExistTableNames } from './utils/data-exporters';
+import { loadCsvFileToObjects } from './utils/data-importers';
 import { threedFileExtensions, imageFileExtensions, pdfFileExtensions } from './utils/resource-file-types';
 
 /**
@@ -74,6 +75,15 @@ importCommand.command('glogfile').action(async (options: any) => {
   await reset(db, schema);
   await db.execute(`ALTER SEQUENCE ${getTableName(resourceFiles)}_id_seq RESTART WITH 1;`);
   await db.insert(resourceFiles).values(resourceFileValues).onConflictDoNothing();
+  await db.$client.end();
+});
+
+importCommand.command('dataCsvFile').action(async (options: any) => {
+  await reset(db, schema);
+  await loadCsvFileToObjects(getTableName(resourceFiles), async (objs) => {
+    await db.execute(`ALTER SEQUENCE ${getTableName(resourceFiles)}_id_seq RESTART WITH 1;`);
+    await db.insert(resourceFiles).values(objs).onConflictDoNothing();
+  });
   await db.$client.end();
 });
 

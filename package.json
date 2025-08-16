@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@json2csv/plainjs": "^7.0.6",
+    "csv-parse": "^6.1.0",
     "drizzle-orm": "^0.44.4",
     "drizzle-seed": "^0.3.1",
     "lodash": "^4.17.21",
