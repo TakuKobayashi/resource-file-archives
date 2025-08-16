@@ -1,0 +1,39 @@
+on:
+  push:
+    branches:
+      - master
+
+name: import-resource-file-info
+jobs:
+  importdata:
+    name: Data Import
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
+    steps:
+    - uses: actions/checkout@v4
+    - name: setup ubuntu
+      run: |
+        sudo apt-get --quiet update --yes
+        sudo apt-get --quiet install --yes git
+    - name: setup and run postgres sql
+      run: docker compose -f docker-compose.yml --env-file .env.local up -d
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: yarn install
+      run: yarn install
+    - name: Register .env
+      working-directory: ./
+      run: |
+        cp .env.local .env
+    - name: drizzle migrate
+      run: yarn run drizzle migrate
+    - name: import csvData
+      run: yarn run tsx src/cli.ts import dataCsvFile
+    - name: import glogfile
+      run:  yarn run tsx src/cli.ts import glogfile
+    - name: export to csv
+      run:  yarn run tsx src/cli.ts export csv
