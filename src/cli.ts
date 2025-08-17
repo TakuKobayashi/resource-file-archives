@@ -39,6 +39,8 @@ async function newResourceFile(filePath: string): Promise<typeof resourceFiles.$
     extension: parsedPath.ext,
     hash: fileHash,
     size: stat.size,
+    updatedAt: new Date(stat.ctimeMs),
+    createdAt: new Date(stat.birthtimeMs),
   };
 }
 
