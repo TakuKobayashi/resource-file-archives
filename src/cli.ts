@@ -82,8 +82,10 @@ importCommand.command('glogfile').action(async (options: any) => {
   await reset(db, schema);
   for (const resourceFileInfo of [ImageFileInfo, ThreedModelFileInfo, PdfFileInfo]) {
     const resourceFileValues = await loadFilePathsFromResourceInfo(resourceFileInfo);
-    await db.execute(`ALTER SEQUENCE ${getTableName(resourceFiles)}_id_seq RESTART WITH 1;`);
-    await db.insert(resourceFiles).values(resourceFileValues).onConflictDoNothing();
+    if (resourceFileValues.length > 0) {
+      await db.execute(`ALTER SEQUENCE ${getTableName(resourceFiles)}_id_seq RESTART WITH 1;`);
+      await db.insert(resourceFiles).values(resourceFileValues).onConflictDoNothing();
+    }
   }
   await db.$client.end();
 });
@@ -91,8 +93,10 @@ importCommand.command('glogfile').action(async (options: any) => {
 importCommand.command('dataCsvFile').action(async (options: any) => {
   await reset(db, schema);
   await loadCsvFileToObjects(getTableName(resourceFiles), async (objs) => {
-    await db.execute(`ALTER SEQUENCE ${getTableName(resourceFiles)}_id_seq RESTART WITH 1;`);
-    await db.insert(resourceFiles).values(objs).onConflictDoNothing();
+    if (objs.length > 0) {
+      await db.execute(`ALTER SEQUENCE ${getTableName(resourceFiles)}_id_seq RESTART WITH 1;`);
+      await db.insert(resourceFiles).values(objs).onConflictDoNothing();
+    }
   });
   await db.$client.end();
 });
