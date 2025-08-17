@@ -1,5 +1,5 @@
 {
-  "id": "736517f7-2931-41f0-9bad-36c45b5dfef1",
+  "id": "524c25e3-9751-4418-85a9-97436c479fee",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -28,6 +28,12 @@
         },
         "extension": {
           "name": "extension",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resource_type": {
+          "name": "resource_type",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true

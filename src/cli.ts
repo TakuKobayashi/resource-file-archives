@@ -14,7 +14,7 @@ import { resourceFiles } from './db/schema';
 import * as schema from './db/schema';
 import { exportToCSV, loadExistTableNames } from './utils/data-exporters';
 import { loadCsvFileToObjects } from './utils/data-importers';
-import { threedFileExtensions, imageFileExtensions, pdfFileExtensions } from './utils/resource-file-types';
+import { ThreedModelFileInfo, ImageFileInfo, PdfFileInfo, ResourceFileInfo, FileCategorys } from './utils/resource-file-types';
 
 /**
  * Set global CLI configurations
@@ -26,7 +26,7 @@ program.version(packageJson.version, '-v, --version');
 const importCommand = new Command('import');
 importCommand.description('import files info');
 
-async function newResourceFile(filePath: string): Promise<typeof resourceFiles.$inferInsert> {
+async function newResourceFile(resourceType: FileCategorys, filePath: string): Promise<typeof resourceFiles.$inferInsert> {
   const appDir = path.dirname(require.main?.filename || '');
   const resolveFilePath = path.resolve(filePath);
   const filepathFromRoot = resolveFilePath.replace(path.resolve(appDir, '..'), '').split(path.sep).join('/');
@@ -37,6 +37,7 @@ async function newResourceFile(filePath: string): Promise<typeof resourceFiles.$
     name: parsedPath.name,
     path: filepathFromRoot,
     extension: parsedPath.ext,
+    resource_type: resourceType,
     hash: fileHash,
     size: stat.size,
     updatedAt: new Date(stat.ctimeMs),
@@ -57,26 +58,33 @@ async function generateFileHash(filePath: string): Promise<string> {
   });
 }
 
-importCommand.command('glogfile').action(async (options: any) => {
+async function loadFilePathsFromResourceInfo(resourceFileInfo: ResourceFileInfo): Promise<(typeof resourceFiles.$inferInsert)[]> {
   const appDir = path.dirname(require.main?.filename || '');
-  const threedModelFilePaths = fg.sync(
+  const resourceFilePaths = fg.sync(
     [
       ...appDir.split(path.sep),
       `..`,
       'resources',
+      resourceFileInfo.fileCategory,
       '**',
-      `*.{${_.union(threedFileExtensions, imageFileExtensions, pdfFileExtensions).join(',')}}`,
+      `*.{${resourceFileInfo.fileExtensions.join(',')}}`,
     ].join('/'),
     { dot: true },
   );
   const resourceFileValuePromises: Promise<typeof resourceFiles.$inferInsert>[] = [];
-  for (const filePath of threedModelFilePaths) {
-    resourceFileValuePromises.push(newResourceFile(filePath));
+  for (const filePath of resourceFilePaths) {
+    resourceFileValuePromises.push(newResourceFile(resourceFileInfo.fileCategory, filePath));
   }
-  const resourceFileValues = await Promise.all(resourceFileValuePromises);
+  return Promise.all(resourceFileValuePromises);
+}
+
+importCommand.command('glogfile').action(async (options: any) => {
   await reset(db, schema);
-  await db.execute(`ALTER SEQUENCE ${getTableName(resourceFiles)}_id_seq RESTART WITH 1;`);
-  await db.insert(resourceFiles).values(resourceFileValues).onConflictDoNothing();
+  for (const resourceFileInfo of [ImageFileInfo, ThreedModelFileInfo, PdfFileInfo]) {
+    const resourceFileValues = await loadFilePathsFromResourceInfo(resourceFileInfo);
+    await db.execute(`ALTER SEQUENCE ${getTableName(resourceFiles)}_id_seq RESTART WITH 1;`);
+    await db.insert(resourceFiles).values(resourceFileValues).onConflictDoNothing();
+  }
   await db.$client.end();
 });
 

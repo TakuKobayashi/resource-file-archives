@@ -1,6 +1,8 @@
-export const threedFileExtensions: string[] = ['glb', 'fbx', 'obj'];
+export type FileCategorys = 'threedmodels' | 'images' | 'pdfs' | 'audios';
 
-export const imageFileExtensions: string[] = [
+const threedFileExtensions: string[] = ['glb', 'fbx', 'obj'];
+
+const imageFileExtensions: string[] = [
   'avif',
   'dz',
   'fits',
@@ -22,4 +24,24 @@ export const imageFileExtensions: string[] = [
   'webp',
 ];
 
-export const pdfFileExtensions: string[] = ['pdf'];
+const pdfFileExtensions: string[] = ['pdf'];
+
+export interface ResourceFileInfo {
+  fileCategory: FileCategorys;
+  fileExtensions: typeof threedFileExtensions & typeof imageFileExtensions & typeof pdfFileExtensions;
+}
+
+export const ThreedModelFileInfo: ResourceFileInfo = {
+  fileCategory: 'threedmodels',
+  fileExtensions: threedFileExtensions,
+};
+
+export const ImageFileInfo: ResourceFileInfo = {
+  fileCategory: 'images',
+  fileExtensions: imageFileExtensions,
+};
+
+export const PdfFileInfo: ResourceFileInfo = {
+  fileCategory: 'pdfs',
+  fileExtensions: pdfFileExtensions,
+};

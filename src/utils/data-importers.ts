@@ -2,7 +2,6 @@ import _ from 'lodash';
 import path from 'path';
 import fs from 'fs';
 import fg from 'fast-glob';
-import readline, { Interface } from 'readline';
 import { parse } from 'csv-parse/sync';
 
 export function loadCsvFileToObjectsSync(tableName: string): any[] {

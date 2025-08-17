@@ -3,6 +3,7 @@ CREATE TABLE "resource_files" (
 	"name" varchar(255) NOT NULL,
 	"path" varchar(255) NOT NULL,
 	"extension" varchar(255) NOT NULL,
+	"resource_type" varchar(255) NOT NULL,
 	"size" bigint DEFAULT 0 NOT NULL,
 	"hash" varchar(255) NOT NULL,
 	"perceptual_hash" varchar(255),

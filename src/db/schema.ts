@@ -6,6 +6,7 @@ export const resourceFiles = pgTable(
     name: varchar('name', { length: 255 }).notNull(),
     path: varchar('path', { length: 255 }).notNull(),
     extension: varchar('extension', { length: 255 }).notNull(),
+    resource_type: varchar('resource_type', { length: 255 }).notNull(),
     size: bigint({ mode: 'number' }).notNull().default(0),
     hash: varchar('hash', { length: 255 }).notNull(),
     perceptualHash: varchar('perceptual_hash', { length: 255 }),
